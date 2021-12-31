@@ -669,7 +669,7 @@ function initializeClient(socket, client, token, lastMessage, openChannel) {
 				chan.setMuteStatus(setMutedTo);
 			}
 
-			socket.emit("mute:changed", {
+			manager.sockets.emit("mute:changed", {
 				target,
 				status: setMutedTo,
 			});
