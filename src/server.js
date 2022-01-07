@@ -178,6 +178,7 @@ module.exports = function (options = {}) {
 				performAuthentication.call(socket, {});
 			} else {
 				socket.on("auth:perform", performAuthentication);
+				socket.on("auth:register", performRegistration);
 				socket.emit("auth:start", serverHash);
 			}
 		});
@@ -345,6 +346,7 @@ function indexRequest(req, res) {
 
 function initializeClient(socket, client, token, lastMessage, openChannel) {
 	socket.off("auth:perform", performAuthentication);
+	socket.off("auth:register", performAuthentication);
 	socket.emit("auth:success");
 
 	client.clientAttach(socket.id, token);
@@ -869,6 +871,42 @@ function performAuthentication(data) {
 
 	// Perform password checking
 	Auth.auth(manager, client, data.user, data.password, authCallback);
+}
+
+function performRegistration(data) {
+	if (!_.isPlainObject(data)) {
+		return;
+	}
+
+	if (typeof data.user !== "string") {
+		return;
+	}
+
+	const socket = this;
+
+	if (Helper.config.public) {
+		return;
+	}
+
+	const users = manager.getUsers();
+
+	if (users === undefined) {
+		return;
+	}
+
+	if (users.includes(data.user)) {
+		log.warn(`User ${colors.bold(data.user)} already exists.`);
+		socket.emit("auth:failed");
+		return;
+	}
+
+	const hash = Helper.password.hash(data.password);
+
+	if (manager.addUser(data.user, hash, true) && manager.loadUser(data.user)) {
+		socket.emit("auth:registered");
+	} else {
+		socket.emit("auth:failed");
+	}
 }
 
 function reverseDnsLookup(ip, callback) {

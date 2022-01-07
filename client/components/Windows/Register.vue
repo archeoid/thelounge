@@ -1,5 +1,5 @@
 <template>
-	<div id="sign-in" class="window" role="tabpanel" aria-label="Sign-in">
+	<div id="register" class="window" role="tabpanel" aria-label="Register">
 		<form class="container" method="post" action="" @submit="onSubmit">
 			<img
 				src="img/logo-vertical-transparent-bg.svg"
@@ -16,9 +16,9 @@
 				height="170"
 			/>
 
-			<label for="signin-username">Username</label>
+			<label for="register-username">Username</label>
 			<input
-				id="signin-username"
+				id="register-username"
 				ref="username"
 				class="input"
 				type="text"
@@ -32,10 +32,10 @@
 			/>
 
 			<div class="password-container">
-				<label for="signin-password">Password</label>
+				<label for="register-password">Password</label>
 				<RevealPassword v-slot:default="slotProps">
 					<input
-						id="signin-password"
+						id="register-password"
 						ref="password"
 						:type="slotProps.isVisible ? 'text' : 'password'"
 						name="password"
@@ -48,9 +48,9 @@
 				</RevealPassword>
 			</div>
 
-			<div v-if="errorShown" class="error">Authentication failed.</div>
-			<button :disabled="inFlight" type="submit" class="btn">Sign in</button>
-			<router-link to="Register" class="link">Register</router-link>
+			<div v-if="errorShown" class="error">Username taken.</div>
+
+			<button :disabled="inFlight" type="submit" class="btn">Register</button>
 		</form>
 	</div>
 </template>
@@ -61,7 +61,7 @@ import socket from "../../js/socket";
 import RevealPassword from "../RevealPassword.vue";
 
 export default {
-	name: "SignIn",
+	name: "Register",
 	components: {
 		RevealPassword,
 	},
@@ -72,15 +72,28 @@ export default {
 		};
 	},
 	mounted() {
-		socket.on("auth:failed", this.onAuthFailed);
+		socket.on("auth:failed", this.onRegisterFailed);
+		socket.on("auth:registered", this.onRegisterSucceed);
 	},
 	beforeDestroy() {
-		socket.off("auth:failed", this.onAuthFailed);
+		socket.off("auth:failed", this.onRegisterFailed);
+		socket.off("auth:registered", this.onRegisterSucceed);
 	},
 	methods: {
-		onAuthFailed() {
+		onRegisterFailed() {
 			this.inFlight = false;
 			this.errorShown = true;
+		},
+		onRegisterSucceed() {
+			this.inFlight = true;
+			this.errorShown = false;
+
+			const values = {
+				user: this.$refs.username.value,
+				password: this.$refs.password.value,
+			};
+			storage.set("user", values.user);
+			socket.emit("auth:perform", values);
 		},
 		onSubmit(event) {
 			event.preventDefault();
@@ -95,7 +108,7 @@ export default {
 
 			storage.set("user", values.user);
 
-			socket.emit("auth:perform", values);
+			socket.emit("auth:register", values);
 		},
 		getStoredUser() {
 			return storage.get("user");

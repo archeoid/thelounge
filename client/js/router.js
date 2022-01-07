@@ -8,6 +8,7 @@ import VueRouter from "vue-router";
 Vue.use(VueRouter);
 
 import SignIn from "../components/Windows/SignIn.vue";
+import Register from "../components/Windows/Register.vue";
 import Connect from "../components/Windows/Connect.vue";
 import Settings from "../components/Windows/Settings.vue";
 import Help from "../components/Windows/Help.vue";
@@ -25,6 +26,20 @@ const router = new VueRouter({
 			component: SignIn,
 			beforeEnter(to, from, next) {
 				// Prevent navigating to sign-in when already signed in
+				if (store.state.appLoaded) {
+					next(false);
+					return;
+				}
+
+				next();
+			},
+		},
+		{
+			name: "Register",
+			path: "/register",
+			component: Register,
+			beforeEnter(to, from, next) {
+				// Prevent navigating to sign-up when already signed in
 				if (store.state.appLoaded) {
 					next(false);
 					return;
@@ -75,7 +90,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next) => {
 	// If user is not yet signed in, wait for appLoaded state to change
 	// unless they are trying to open SignIn (which can be triggered in auth.js)
-	if (!store.state.appLoaded && to.name !== "SignIn") {
+	if (!store.state.appLoaded && to.name !== "SignIn" && to.name !== "Register") {
 		store.watch(
 			(state) => state.appLoaded,
 			() => next()

@@ -197,6 +197,17 @@ p {
 	margin: 0 0 10px;
 }
 
+.link {
+	color: var(--button-color);
+	display: inline-block;
+	font-size: 12px;
+	font-weight: bold;
+	letter-spacing: 1px;
+	margin: 0 0 10px;
+	text-transform: uppercase;
+	word-spacing: 3px;
+}
+
 .btn {
 	border: 2px solid var(--button-color);
 	border-radius: 3px;
@@ -1828,6 +1839,16 @@ part/quit messages where we don't load previews (adds a blank line otherwise) */
 	flex-direction: column;
 }
 
+#register .container,
+#loading-reload-container,
+#loading-status-container {
+	flex: 1 0 auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+
 #loading-reload-container {
 	flex-grow: 0;
 }
@@ -1848,6 +1869,22 @@ part/quit messages where we don't load previews (adds a blank line otherwise) */
 }
 
 #sign-in .error {
+	color: #e74c3c;
+	margin-top: 1em;
+	width: 100%;
+}
+
+#register label {
+	display: block;
+	margin-top: 10px;
+	width: 100%;
+}
+
+#register .btn {
+	margin-top: 25px;
+}
+
+#register .error {
 	color: #e74c3c;
 	margin-top: 1em;
 	width: 100%;
@@ -1995,6 +2032,14 @@ part/quit messages where we don't load previews (adds a blank line otherwise) */
 }
 
 #sign-in .password-container .reveal-password {
+	top: 31px;
+}
+
+#register .password-container {
+	width: 100%;
+}
+
+#register .password-container .reveal-password {
 	top: 31px;
 }
 
@@ -2697,6 +2742,10 @@ part/quit messages where we don't load previews (adds a blank line otherwise) */
 	}
 
 	#sign-in .btn {
+		width: 100%;
+	}
+
+	#register .btn {
 		width: 100%;
 	}
 
